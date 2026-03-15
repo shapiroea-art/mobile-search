@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Lumana — Search Section Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --bg-secondary: #F5F6F8;
+    --bg-tertiary: #ECEEF2;
+    --surface: #FFFFFF;
+    --border: #E4E7EC;
+    --border-light: #F0F2F5;
+    --text: #101828;
+    --text-secondary: #475467;
+    --text-tertiary: #98A2B3;
+    --accent: #4A55F2;
+    --accent-light: #EEF0FE;
+    --accent-glow: rgba(74, 85, 242, 0.12);
+    --accent-gradient: linear-gradient(135deg, #4A55F2, #7B5CF6);
+    --green: #17B26A;
+    --green-bg: #ECFDF3;
+    --red: #F04438;
+    --shadow-xs: 0 1px 2px rgba(16,24,40,0.05);
+    --shadow-sm: 0 1px 3px rgba(16,24,40,0.1), 0 1px 2px rgba(16,24,40,0.06);
+    --shadow-md: 0 4px 8px -2px rgba(16,24,40,0.1), 0 2px 4px -2px rgba(16,24,40,0.06);
+    --shadow-lg: 0 12px 24px -4px rgba(16,24,40,0.08), 0 4px 8px -2px rgba(16,24,40,0.04);
+    --radius: 12px;
+    --radius-lg: 16px;
+    --radius-sm: 8px;
+    --radius-pill: 100px;
+    --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #E2E4EA;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 24px 0;
+  }
+
+  .device {
+    width: 375px;
+    height: 812px;
+    background: var(--bg);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 0 8px #1D1D1F, 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .screen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ─── Status bar ─── */
+  .status-bar {
+    height: 54px;
+    padding: 14px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-shrink: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  .status-bar .time { font-size: 15px; font-weight: 600; color: var(--text); }
+  .status-bar .icons { display: flex; gap: 5px; align-items: center; }
+  .status-bar .icons svg { width: 16px; height: 16px; color: var(--text); }
+
+  /* ─── Top bar ─── */
+  .top-bar {
+    padding: 0 16px 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  .hamburger {
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border-radius: 10px;
+  }
+  .hamburger:active { background: var(--bg-secondary); }
+  .hamburger svg { width: 22px; height: 22px; color: var(--text); }
+  .page-title { font-size: 22px; font-weight: 700; color: var(--text); }
+
+  /* ─── Segmented control ─── */
+  .segment-bar {
+    padding: 0 16px 10px;
+    flex-shrink: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  .segment-control {
+    display: flex;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 3px;
+    position: relative;
+  }
+  .segment-btn {
+    flex: 1;
+    padding: 8px 0;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: var(--text-tertiary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all var(--transition);
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .segment-btn.active {
+    background: var(--bg);
+    color: var(--text);
+    box-shadow: var(--shadow-sm);
+  }
+  .segment-btn svg { width: 15px; height: 15px; }
+
+  /* ─── Filter area ─── */
+  .filter-area {
+    padding: 0 12px 0;
+    flex-shrink: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+
+  /* Object selector */
+  .object-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition);
+    border: 1.5px solid transparent;
+  }
+  .object-selector:active { transform: scale(0.985); }
+  .object-selector:hover { border-color: var(--border); }
+  .object-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .object-icon.people { background: #EEF0FE; }
+  .object-icon.faces { background: #FFF4ED; }
+  .object-icon.vehicles { background: #ECFDF3; }
+  .object-icon.pets { background: #FEF7EC; }
+  .object-icon.lpr { background: #F0F4FF; }
+  .object-info { flex: 1; }
+  .object-label { font-size: 11px; color: var(--text-tertiary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .object-name { font-size: 16px; font-weight: 600; color: var(--text); margin-top: 1px; }
+  .object-chevron { color: var(--text-tertiary); flex-shrink: 0; }
+
+  /* Object-specific settings */
+  .object-settings {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  .object-settings.visible {
+    max-height: 120px;
+    opacity: 1;
+    margin-top: 8px;
+  }
+  .lpr-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .lpr-input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: border-color var(--transition);
+  }
+  .lpr-input:focus { border-color: var(--accent); }
+  .lpr-input::placeholder { color: var(--text-tertiary); text-transform: none; letter-spacing: normal; }
+  .lpr-match-btn {
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+  }
+  .lpr-match-btn:active { background: var(--bg-secondary); }
+
+  .face-ref-row {
+    display: flex;
+    gap: 8px;
+  }
+  .face-ref-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    border: 1.5px dashed var(--border);
+    background: var(--bg);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all var(--transition);
+  }
+  .face-ref-btn:active { background: var(--bg-secondary); border-style: solid; }
+  .face-ref-btn svg { width: 16px; height: 16px; color: var(--text-tertiary); }
+
+  /* Text search input */
+  .text-search-bar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    border: 1.5px solid transparent;
+    transition: all var(--transition);
+  }
+  .text-search-bar.active {
+    display: flex;
+  }
+  .text-search-bar.focused {
+    border-color: var(--accent);
+    background: var(--bg);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .ai-badge {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--accent-gradient);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .ai-badge svg { width: 16px; height: 16px; }
+  .text-search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    caret-color: var(--accent);
+  }
+  .text-search-input::placeholder { color: var(--text-tertiary); font-weight: 400; }
+  .text-search-send {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--accent);
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    opacity: 0.3;
+    transition: all var(--transition);
+  }
+  .text-search-send.ready { opacity: 1; }
+  .text-search-send:active { transform: scale(0.92); }
+  .text-search-send svg { width: 16px; height: 16px; }
+
+  /* Filter pills row */
+  .filter-pills {
+    display: flex;
+    gap: 8px;
+    padding: 10px 0 0;
+  }
+  .filter-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-secondary);
+  }
+  .filter-pill:active { transform: scale(0.96); background: var(--bg-secondary); }
+  .filter-pill svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--text-tertiary); }
+  .filter-pill .pill-value { color: var(--text); font-weight: 600; }
+
+  /* ─── Results header ─── */
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px 8px;
+    flex-shrink: 0;
+    background: var(--bg);
+    z-index: 5;
+  }
+  .results-count {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  .results-count strong { color: var(--text); font-weight: 700; }
+  .sort-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+  }
+  .sort-btn:active { background: var(--bg-secondary); }
+  .sort-btn svg { width: 14px; height: 14px; }
+
+  /* ─── Results grid ─── */
+  .results-grid-wrap {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 12px 100px;
+  }
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .result-card {
+    background: var(--bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+  .result-card:active { transform: scale(0.97); }
+
+  .card-thumb {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    position: relative;
+    overflow: hidden;
+  }
+  .card-scene {
+    width: 100%; height: 100%;
+    position: relative;
+  }
+  .card-scene .floor {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 35%;
+  }
+  .card-scene .wall {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 35%;
+  }
+  .card-scene .obj {
+    position: absolute;
+    border-radius: 3px;
+  }
+  .detection-box {
+    position: absolute;
+    border: 1.5px solid var(--accent);
+    border-radius: 3px;
+    box-shadow: 0 0 6px var(--accent-glow);
+  }
+  .card-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 50%;
+    background: linear-gradient(transparent, rgba(0,0,0,0.45));
+  }
+  .card-camera {
+    position: absolute; bottom: 5px; left: 5px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(6px);
+    color: white;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .card-duration {
+    position: absolute; top: 5px; right: 5px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(6px);
+    color: white;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .card-meta {
+    padding: 7px 8px;
+  }
+  .card-time {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  .card-match {
+    font-size: 10px;
+    color: var(--green);
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  /* Skeleton loading */
+  .skeleton-card .card-thumb {
+    background: linear-gradient(110deg, #F0F2F5 30%, #E8EBF0 50%, #F0F2F5 70%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  .skeleton-card .card-meta { padding: 8px; }
+  .skeleton-line {
+    height: 10px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    margin-bottom: 4px;
+  }
+  .skeleton-line.short { width: 60%; }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ─── Bottom nav ─── */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 84px;
+    background: var(--bg);
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    padding: 6px 0 28px;
+    z-index: 20;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+    color: var(--text-tertiary);
+    transition: color var(--transition);
+    padding-top: 4px;
+  }
+  .nav-item.active { color: var(--accent); }
+  .nav-item svg { width: 22px; height: 22px; }
+  .nav-item span { font-size: 10px; font-weight: 500; }
+
+  /* ─── Bottom sheet overlay ─── */
+  .sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .sheet-backdrop.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .bottom-sheet {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: var(--bg);
+    border-radius: 20px 20px 0 0;
+    z-index: 51;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    max-height: 85%;
+    overflow-y: auto;
+  }
+  .bottom-sheet.open {
+    transform: translateY(0);
+  }
+  .sheet-handle {
+    width: 36px; height: 4px;
+    background: var(--bg-tertiary);
+    border-radius: 2px;
+    margin: 10px auto 0;
+  }
+  .sheet-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    padding: 14px 20px 12px;
+  }
+
+  /* Object picker items */
+  .object-pick-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: background var(--transition);
+  }
+  .object-pick-item:active { background: var(--bg-secondary); }
+  .object-pick-item.selected { background: var(--accent-light); }
+  .opi-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .opi-info { flex: 1; }
+  .opi-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .opi-desc { font-size: 12px; color: var(--text-tertiary); margin-top: 1px; }
+  .opi-check {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all var(--transition);
+  }
+  .object-pick-item.selected .opi-check {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* Time picker */
+  .time-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    cursor: pointer;
+    transition: background var(--transition);
+    border-bottom: 1px solid var(--border-light);
+  }
+  .time-option:last-child { border-bottom: none; }
+  .time-option:active { background: var(--bg-secondary); }
+  .time-option.selected { background: var(--accent-light); }
+  .time-option .to-label { font-size: 14px; font-weight: 500; color: var(--text); }
+  .time-option .to-check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    transition: all var(--transition);
+  }
+  .time-option.selected .to-check {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* Camera picker */
+  .cam-group-header {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-tertiary);
+    padding: 16px 20px 6px;
+  }
+  .cam-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 20px;
+    cursor: pointer;
+    transition: background var(--transition);
+  }
+  .cam-item:active { background: var(--bg-secondary); }
+  .cam-checkbox {
+    width: 20px; height: 20px;
+    border-radius: 5px;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all var(--transition);
+  }
+  .cam-checkbox.checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .cam-checkbox svg { width: 12px; height: 12px; }
+  .cam-name { font-size: 14px; color: var(--text); font-weight: 500; }
+  .cam-status {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-left: auto;
+  }
+  .cam-status.online { color: var(--green); background: var(--green-bg); }
+  .cam-all-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cam-all-label { font-size: 15px; font-weight: 600; color: var(--text); }
+  .toggle-track {
+    width: 44px; height: 26px;
+    border-radius: 13px;
+    background: var(--bg-tertiary);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .toggle-track.on { background: var(--accent); }
+  .toggle-knob {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: white;
+    position: absolute;
+    top: 2px; left: 2px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease;
+  }
+  .toggle-track.on .toggle-knob { transform: translateX(18px); }
+  .sheet-apply-bar {
+    padding: 12px 20px 28px;
+    border-top: 1px solid var(--border-light);
+    position: sticky;
+    bottom: 0;
+    background: var(--bg);
+  }
+  .sheet-apply-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all var(--transition);
+  }
+  .sheet-apply-btn:active { transform: scale(0.98); opacity: 0.9; }
+
+  /* ─── Loading bar ─── */
+  .search-loading {
+    height: 2px;
+    background: var(--bg-secondary);
+    flex-shrink: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .search-loading.active { opacity: 1; }
+  .search-loading .bar {
+    height: 100%;
+    width: 30%;
+    background: var(--accent);
+    border-radius: 1px;
+    animation: loadSlide 1s ease-in-out infinite;
+  }
+  @keyframes loadSlide {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(450%); }
+  }
+
+  /* ─── Toast notification ─── */
+  .toast {
+    position: absolute;
+    top: 64px; left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--text);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    z-index: 60;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div class="device">
+  <div class="screen">
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="icons">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 11.5l3-3 3 3 3-6 3 3V13H1z"/></svg>
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 2C4.7 2 2 4.1 2 6.7L8 14l6-7.3C14 4.1 11.3 2 8 2z"/></svg>
+        <svg viewBox="0 0 20 12" fill="currentColor"><rect x="0" y="0" width="18" height="12" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="2" y="2" width="12" height="8" rx="1"/><rect x="18.5" y="3.5" width="1.5" height="5" rx="0.5"/></svg>
+      </div>
+    </div>
+
+    <!-- Top bar -->
+    <div class="top-bar">
+      <div class="hamburger">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </div>
+      <span class="page-title">Search</span>
+    </div>
+
+    <!-- Segmented control -->
+    <div class="segment-bar">
+      <div class="segment-control">
+        <button class="segment-btn active" data-mode="filter">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          Filters
+        </button>
+        <button class="segment-btn" data-mode="text">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+          AI Text
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter area -->
+    <div class="filter-area">
+      <!-- Mode A: Object selector -->
+      <div class="object-selector" id="objectSelector">
+        <div class="object-icon people" id="objIconEl">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A55F2" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="object-info">
+          <div class="object-label">Searching for</div>
+          <div class="object-name" id="objNameEl">People</div>
+        </div>
+        <div class="object-chevron">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+
+      <!-- Object-specific settings -->
+      <div class="object-settings" id="lprSettings">
+        <div class="lpr-input-row">
+          <input class="lpr-input" type="text" placeholder="Enter plate number" maxlength="10" id="lprInput">
+          <button class="lpr-match-btn" id="lprMatchBtn">Contains ▾</button>
+        </div>
+      </div>
+      <div class="object-settings" id="faceSettings">
+        <div class="face-ref-row">
+          <button class="face-ref-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            Upload Photo
+          </button>
+          <button class="face-ref-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Take Photo
+          </button>
+        </div>
+      </div>
+
+      <!-- Mode B: Text search input -->
+      <div class="text-search-bar" id="textSearchBar">
+        <div class="ai-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+        </div>
+        <input class="text-search-input" type="text" placeholder="Describe what you're looking for..." id="textInput">
+        <button class="text-search-send" id="textSendBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Camera + Time pills -->
+      <div class="filter-pills">
+        <div class="filter-pill" id="cameraPill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span class="pill-value" id="cameraValue">All Cameras</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="filter-pill" id="timePill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span class="pill-value" id="timeValue">Last 3 Days</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading bar -->
+    <div class="search-loading" id="searchLoading"><div class="bar"></div></div>
+
+    <!-- Results header -->
+    <div class="results-header">
+      <div class="results-count" id="resultsCount"><strong>248</strong> results</div>
+      <button class="sort-btn" id="sortBtn">
+        Newest
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+    </div>
+
+    <!-- Results grid -->
+    <div class="results-grid-wrap" id="resultsWrap">
+      <div class="results-grid" id="resultsGrid"></div>
+    </div>
+
+    <!-- Bottom nav -->
+    <div class="bottom-nav">
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <span>Cameras</span>
+      </div>
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>Search</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span>Alerts</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>More</span>
+      </div>
+    </div>
+
+    <!-- Sheet backdrop -->
+    <div class="sheet-backdrop" id="sheetBackdrop"></div>
+
+    <!-- Object picker sheet -->
+    <div class="bottom-sheet" id="objectSheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Search for</div>
+      <div id="objectPickList"></div>
+    </div>
+
+    <!-- Time picker sheet -->
+    <div class="bottom-sheet" id="timeSheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Time Range</div>
+      <div id="timePickList"></div>
+    </div>
+
+    <!-- Camera picker sheet -->
+    <div class="bottom-sheet" id="cameraSheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Cameras</div>
+      <div class="cam-all-toggle">
+        <span class="cam-all-label">All Cameras</span>
+        <div class="toggle-track on" id="camAllToggle"><div class="toggle-knob"></div></div>
+      </div>
+      <div id="cameraPickList"></div>
+      <div class="sheet-apply-bar">
+        <button class="sheet-apply-btn" id="camApplyBtn">Apply</button>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<script>
+const OBJ_ICONS = {
+  people: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A55F2" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  faces: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E87B35" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>',
+  vehicles: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#17B26A" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1l2-3h8l2 3h1a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2M5 17l-1 3h2m12-3l1 3h-2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>',
+  pets: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D98A0B" stroke-width="2"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="4" cy="13" r="2"/><circle cx="20" cy="13" r="2"/><path d="M12 20c-2.5 0-4.5-1.5-5-4 0-2 1.5-3 3-3.5a7 7 0 0 1 4 0c1.5.5 3 1.5 3 3.5-.5 2.5-2.5 4-5 4z"/></svg>',
+  lpr: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A6CF7" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><text x="12" y="15" text-anchor="middle" font-size="8" font-weight="700" font-family="Inter,sans-serif" fill="#4A6CF7" stroke="none">ABC</text></svg>',
+};
+
+const OBJECTS = [
+  { id: 'people', name: 'People', desc: 'Detected human bodies', color: '#EEF0FE', settings: null },
+  { id: 'faces', name: 'Faces', desc: 'Detected & recognized faces', color: '#FFF4ED', settings: 'face' },
+  { id: 'vehicles', name: 'Vehicles', desc: 'Cars, trucks, motorcycles', color: '#ECFDF3', settings: null },
+  { id: 'pets', name: 'Pets', desc: 'Dogs, cats and other animals', color: '#FEF7EC', settings: null },
+  { id: 'lpr', name: 'License Plates', desc: 'Plate number recognition', color: '#F0F4FF', settings: 'lpr' },
+];
+
+const TIMES = [
+  { id: '1h', label: 'Last 1 Hour' },
+  { id: '3h', label: 'Last 3 Hours' },
+  { id: '24h', label: 'Last 24 Hours' },
+  { id: '3d', label: 'Last 3 Days' },
+  { id: '7d', label: 'Last 7 Days' },
+  { id: '30d', label: 'Last 30 Days' },
+];
+
+const CAMERAS = [
+  { group: 'Main Building', items: [
+    { id: 'c1', name: 'Lobby Entrance - Cam 1', online: true },
+    { id: 'c2', name: 'Reception - Cam 2', online: true },
+    { id: 'c3', name: 'Hallway East - Cam 3', online: true },
+    { id: 'c4', name: 'Hallway West - Cam 4', online: false },
+  ]},
+  { group: 'Parking', items: [
+    { id: 'c5', name: 'Lot A Entry - Cam 5', online: true },
+    { id: 'c6', name: 'Lot A Exit - Cam 6', online: true },
+    { id: 'c7', name: 'Lot B - Cam 7', online: true },
+  ]},
+  { group: 'Perimeter', items: [
+    { id: 'c8', name: 'North Gate - Cam 8', online: true },
+    { id: 'c9', name: 'South Gate - Cam 9', online: true },
+    { id: 'c10', name: 'Loading Dock - Cam 10', online: true },
+    { id: 'c11', name: 'Fence Line - Cam 11', online: true },
+  ]},
+];
+
+const CAMERA_NAMES = CAMERAS.flatMap(g => g.items.map(c => c.name));
+const RESULT_COUNTS = { people: 248, faces: 67, vehicles: 134, pets: 18, lpr: 89 };
+const DURATIONS = ['3s','4s','5s','7s','8s','12s','15s','6s','9s','11s'];
+const SCENE_COLORS = [
+  { wall: '#2a3048', floor: '#3a4055' },
+  { wall: '#1e2535', floor: '#333a4c' },
+  { wall: '#252d40', floor: '#384050' },
+  { wall: '#1a2030', floor: '#2e3545' },
+  { wall: '#222a3e', floor: '#3c4458' },
+  { wall: '#1c2438', floor: '#303848' },
+];
+
+let currentMode = 'filter';
+let currentObject = OBJECTS[0];
+let currentTime = TIMES[3];
+let allCameras = true;
+let selectedCams = new Set(CAMERAS.flatMap(g => g.items.map(c => c.id)));
+let activeSheet = null;
+
+const $ = id => document.getElementById(id);
+
+function showToast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1400);
+}
+
+function showLoading() {
+  $('searchLoading').classList.add('active');
+  setTimeout(() => $('searchLoading').classList.remove('active'), 800);
+}
+
+function openSheet(id) {
+  activeSheet = id;
+  $('sheetBackdrop').classList.add('visible');
+  $(id).classList.add('open');
+}
+
+function closeSheet() {
+  $('sheetBackdrop').classList.remove('visible');
+  if (activeSheet) $(activeSheet).classList.remove('open');
+  activeSheet = null;
+}
+
+$('sheetBackdrop').addEventListener('click', closeSheet);
+
+// ─── Mode switching ───
+document.querySelectorAll('.segment-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const mode = btn.dataset.mode;
+    if (mode === currentMode) return;
+    currentMode = mode;
+    document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    if (mode === 'filter') {
+      $('objectSelector').style.display = '';
+      $('textSearchBar').classList.remove('active');
+      updateObjectSettings();
+      showLoading();
+      renderResults();
+    } else {
+      $('objectSelector').style.display = 'none';
+      $('lprSettings').classList.remove('visible');
+      $('faceSettings').classList.remove('visible');
+      $('textSearchBar').classList.add('active');
+      $('textInput').focus();
+    }
+  });
+});
+
+// ─── Object selector ───
+function updateObjectUI() {
+  const iconEl = $('objIconEl');
+  iconEl.className = 'object-icon ' + currentObject.id;
+  iconEl.style.background = currentObject.color;
+  iconEl.innerHTML = OBJ_ICONS[currentObject.id];
+  $('objNameEl').textContent = currentObject.name;
+  updateObjectSettings();
+}
+
+function updateObjectSettings() {
+  $('lprSettings').classList.remove('visible');
+  $('faceSettings').classList.remove('visible');
+  if (currentObject.settings === 'lpr') {
+    $('lprSettings').classList.add('visible');
+  } else if (currentObject.settings === 'face') {
+    $('faceSettings').classList.add('visible');
+  }
+}
+
+$('objectSelector').addEventListener('click', () => openSheet('objectSheet'));
+
+function buildObjectPicker() {
+  const list = $('objectPickList');
+  list.innerHTML = '';
+  OBJECTS.forEach(obj => {
+    const item = document.createElement('div');
+    item.className = 'object-pick-item' + (obj.id === currentObject.id ? ' selected' : '');
+    item.innerHTML = `
+      <div class="opi-icon" style="background:${obj.color}">${OBJ_ICONS[obj.id]}</div>
+      <div class="opi-info">
+        <div class="opi-name">${obj.name}</div>
+        <div class="opi-desc">${obj.desc}</div>
+      </div>
+      <div class="opi-check">${obj.id === currentObject.id ? '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}</div>
+    `;
+    item.addEventListener('click', () => {
+      currentObject = obj;
+      closeSheet();
+      updateObjectUI();
+      showLoading();
+      renderResults();
+      showToast('Searching for ' + obj.name);
+      buildObjectPicker();
+    });
+    list.appendChild(item);
+  });
+}
+
+// ─── Time picker ───
+$('timePill').addEventListener('click', () => {
+  buildTimePicker();
+  openSheet('timeSheet');
+});
+
+function buildTimePicker() {
+  const list = $('timePickList');
+  list.innerHTML = '';
+  TIMES.forEach(t => {
+    const item = document.createElement('div');
+    item.className = 'time-option' + (t.id === currentTime.id ? ' selected' : '');
+    item.innerHTML = `
+      <span class="to-label">${t.label}</span>
+      <div class="to-check">${t.id === currentTime.id ? '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>' : ''}</div>
+    `;
+    item.addEventListener('click', () => {
+      currentTime = t;
+      $('timeValue').textContent = t.label;
+      closeSheet();
+      showLoading();
+      renderResults();
+      showToast(t.label);
+    });
+    list.appendChild(item);
+  });
+}
+
+// ─── Camera picker ───
+$('cameraPill').addEventListener('click', () => {
+  buildCameraPicker();
+  openSheet('cameraSheet');
+});
+
+function updateCameraLabel() {
+  const total = CAMERAS.flatMap(g => g.items).length;
+  if (allCameras || selectedCams.size === total) {
+    $('cameraValue').textContent = 'All Cameras';
+  } else {
+    $('cameraValue').textContent = selectedCams.size + ' Camera' + (selectedCams.size !== 1 ? 's' : '');
+  }
+}
+
+function buildCameraPicker() {
+  const list = $('cameraPickList');
+  list.innerHTML = '';
+  const toggle = $('camAllToggle');
+  toggle.className = 'toggle-track' + (allCameras ? ' on' : '');
+
+  CAMERAS.forEach(group => {
+    const header = document.createElement('div');
+    header.className = 'cam-group-header';
+    header.textContent = group.group;
+    list.appendChild(header);
+
+    group.items.forEach(cam => {
+      const item = document.createElement('div');
+      item.className = 'cam-item';
+      const checked = allCameras || selectedCams.has(cam.id);
+      item.innerHTML = `
+        <div class="cam-checkbox ${checked ? 'checked' : ''}">
+          ${checked ? '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+        </div>
+        <span class="cam-name">${cam.name}</span>
+        <span class="cam-status online">${cam.online ? 'Online' : 'Offline'}</span>
+      `;
+      item.addEventListener('click', () => {
+        if (allCameras) {
+          allCameras = false;
+          selectedCams = new Set([cam.id]);
+        } else if (selectedCams.has(cam.id)) {
+          selectedCams.delete(cam.id);
+          if (selectedCams.size === 0) {
+            allCameras = true;
+            selectedCams = new Set(CAMERAS.flatMap(g => g.items.map(c => c.id)));
+          }
+        } else {
+          selectedCams.add(cam.id);
+          if (selectedCams.size === CAMERAS.flatMap(g => g.items).length) allCameras = true;
+        }
+        buildCameraPicker();
+      });
+      list.appendChild(item);
+    });
+  });
+}
+
+$('camAllToggle').addEventListener('click', () => {
+  allCameras = !allCameras;
+  if (allCameras) selectedCams = new Set(CAMERAS.flatMap(g => g.items.map(c => c.id)));
+  else selectedCams = new Set();
+  buildCameraPicker();
+});
+
+$('camApplyBtn').addEventListener('click', () => {
+  if (!allCameras && selectedCams.size === 0) {
+    allCameras = true;
+    selectedCams = new Set(CAMERAS.flatMap(g => g.items.map(c => c.id)));
+  }
+  updateCameraLabel();
+  closeSheet();
+  showLoading();
+  renderResults();
+  showToast(allCameras ? 'All cameras' : selectedCams.size + ' cameras selected');
+});
+
+// ─── Text search ───
+const textInput = $('textInput');
+const sendBtn = $('textSendBtn');
+
+textInput.addEventListener('focus', () => $('textSearchBar').classList.add('focused'));
+textInput.addEventListener('blur', () => $('textSearchBar').classList.remove('focused'));
+textInput.addEventListener('input', () => {
+  sendBtn.classList.toggle('ready', textInput.value.trim().length > 0);
+});
+
+function executeTextSearch() {
+  const q = textInput.value.trim();
+  if (!q) return;
+  showLoading();
+  const count = 20 + Math.floor(Math.random() * 80);
+  $('resultsCount').innerHTML = `<strong>${count}</strong> results · by relevance`;
+  renderResults();
+  showToast('AI search: "' + (q.length > 25 ? q.slice(0,25) + '…' : q) + '"');
+  textInput.blur();
+}
+
+sendBtn.addEventListener('click', executeTextSearch);
+textInput.addEventListener('keydown', e => { if (e.key === 'Enter') executeTextSearch(); });
+
+const placeholders = [
+  'Describe what you\'re looking for...',
+  '"person in red jacket near gate 3"',
+  '"white van in parking lot after 6pm"',
+  '"someone carrying a large box"',
+  '"crowd near emergency exit"',
+];
+let phIdx = 0;
+setInterval(() => {
+  if (currentMode !== 'text' || document.activeElement === textInput) return;
+  textInput.style.transition = 'opacity 0.3s';
+  textInput.style.opacity = '0';
+  setTimeout(() => {
+    phIdx = (phIdx + 1) % placeholders.length;
+    textInput.placeholder = placeholders[phIdx];
+    textInput.style.opacity = '1';
+  }, 300);
+}, 3500);
+
+// ─── Results rendering ───
+function generateTime() {
+  const h = Math.floor(Math.random() * 12) + 1;
+  const m = Math.floor(Math.random() * 60);
+  const ampm = Math.random() > 0.5 ? 'PM' : 'AM';
+  const months = ['Mar 13','Mar 14','Mar 15','Mar 12','Mar 11'];
+  return months[Math.floor(Math.random() * months.length)] + ' · ' + h + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+}
+
+function renderResults() {
+  const grid = $('resultsGrid');
+  const count = RESULT_COUNTS[currentObject.id] || Math.floor(Math.random() * 200 + 20);
+
+  if (currentMode === 'filter') {
+    $('resultsCount').innerHTML = `<strong>${count}</strong> results`;
+    $('sortBtn').innerHTML = 'Newest <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="6 9 12 15 18 9"/></svg>';
+  }
+
+  grid.innerHTML = '';
+
+  // Show skeletons first
+  for (let i = 0; i < 6; i++) {
+    const card = document.createElement('div');
+    card.className = 'result-card skeleton-card';
+    card.innerHTML = `
+      <div class="card-thumb"></div>
+      <div class="card-meta">
+        <div class="skeleton-line" style="width:${70 + Math.random()*30}%"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+
+  // Replace with real cards after delay
+  setTimeout(() => {
+    grid.innerHTML = '';
+    const showing = Math.min(count, 12);
+    for (let i = 0; i < showing; i++) {
+      const sc = SCENE_COLORS[i % SCENE_COLORS.length];
+      const camName = CAMERA_NAMES[Math.floor(Math.random() * CAMERA_NAMES.length)];
+      const dur = DURATIONS[Math.floor(Math.random() * DURATIONS.length)];
+      const confidence = 70 + Math.floor(Math.random() * 28);
+
+      const detLeft = 15 + Math.floor(Math.random() * 55);
+      const detTop = 15 + Math.floor(Math.random() * 20);
+      const detW = 10 + Math.floor(Math.random() * 15);
+      const detH = 35 + Math.floor(Math.random() * 25);
+
+      let objHTML = '';
+      if (currentObject.id === 'people' || currentObject.id === 'faces') {
+        const px = detLeft + detW/2 - 4;
+        objHTML = `
+          <div class="obj" style="left:${px}%;bottom:35%;width:10px;height:16px;background:#5a6078;border-radius:2px 2px 1px 1px;"></div>
+          <div class="obj" style="left:${px+1}%;bottom:${35+16*0.6}%;width:8px;height:8px;background:#6a7088;border-radius:50%;"></div>
+        `;
+        if (Math.random() > 0.4) {
+          const px2 = (detLeft + 30) % 80 + 5;
+          objHTML += `
+            <div class="obj" style="left:${px2}%;bottom:35%;width:10px;height:16px;background:#4a5068;border-radius:2px 2px 1px 1px;"></div>
+            <div class="obj" style="left:${px2+1}%;bottom:${35+16*0.6}%;width:8px;height:8px;background:#5a6078;border-radius:50%;"></div>
+          `;
+        }
+      } else if (currentObject.id === 'vehicles' || currentObject.id === 'lpr') {
+        const px = detLeft;
+        objHTML = `<div class="obj" style="left:${px}%;bottom:36%;width:${detW+8}%;height:12px;background:#4a5068;border-radius:3px;"></div>`;
+      } else if (currentObject.id === 'pets') {
+        const px = detLeft + 2;
+        objHTML = `<div class="obj" style="left:${px}%;bottom:36%;width:14px;height:9px;background:#5a6078;border-radius:3px 3px 2px 2px;"></div>`;
+      }
+
+      const card = document.createElement('div');
+      card.className = 'result-card';
+      card.innerHTML = `
+        <div class="card-thumb">
+          <div class="card-scene">
+            <div class="wall" style="background:${sc.wall}"></div>
+            <div class="floor" style="background:${sc.floor}"></div>
+            ${objHTML}
+          </div>
+          <div class="detection-box" style="left:${detLeft}%;top:${detTop}%;width:${detW}%;height:${detH}%;"></div>
+          <div class="card-overlay"></div>
+          <div class="card-camera">${camName.split(' - ')[0]}</div>
+          <div class="card-duration">${dur}</div>
+        </div>
+        <div class="card-meta">
+          <div class="card-time">${generateTime()}</div>
+          <div class="card-match">${confidence}% match</div>
+        </div>
+      `;
+      card.addEventListener('click', () => showToast('Opening clip…'));
+      grid.appendChild(card);
+    }
+  }, 600);
+}
+
+// ─── Initialize ───
+buildObjectPicker();
+buildTimePicker();
+buildCameraPicker();
+updateObjectUI();
+renderResults();
+</script>
+</body>
+</html>
